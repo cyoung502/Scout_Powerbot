@@ -65,7 +65,7 @@ public class Experience extends AbstractScript<ClientContext> {
      * @param skill The input skill, use ie: Constants.SKILLS_ATTACK.
      * @return int The experience gained since start for input skill.
      */
-    private int getExperienceGained(int skill) {
+    public int getExperienceGained(int skill) {
 
         return ctx.skills.experience(skill) - xpStart[skill];
     }
@@ -78,7 +78,7 @@ public class Experience extends AbstractScript<ClientContext> {
      * @param skill The input skill, use ie: Constants.SKILLS_ATTACK.
      * @return int The experience rate per hour.
      */
-    private int getExperienceHour(int skill) {
+    public int getExperienceHour(int skill) {
 
         return (int) ((getExperienceGained(skill) * 3600000D) / getRuntime());
     }
@@ -89,12 +89,12 @@ public class Experience extends AbstractScript<ClientContext> {
      * @param skill The input skill, use ie: Constants.SKILLS_ATTACK.
      * @return int The current perecentage to the next level.
      */
-    private int getExperiencePercent(int skill) {
+    public int getExperiencePercent(int skill) {
 
         double numerator = ctx.skills.experience(skill) -
                 ctx.skills.experienceAt(ctx.skills.realLevel(skill));
         double denominator = ctx.skills.experienceAt(ctx.skills.realLevel(skill) + 1) -
-                ctx.skills.experience(ctx.skills.realLevel(skill));
+                ctx.skills.experienceAt(ctx.skills.realLevel(skill));
         return (int) ((numerator / denominator) * 100);
     }
 
@@ -104,7 +104,7 @@ public class Experience extends AbstractScript<ClientContext> {
      * @param skill The input skill, use ie: Constants.SKILLS_ATTACK.
      * @return long The time to level in milliseconds.
      */
-    private long getTimeToLevel(int skill) {
+    public long getTimeToLevel(int skill) {
 
         double xpToLevel = ctx.skills.experienceAt(ctx.skills.realLevel(skill) + 1) - ctx.skills.experience(skill);
         double xpHour = getExperienceHour(skill);

@@ -24,8 +24,8 @@ public class BroteinMiner extends PollingScript<ClientContext> implements Messag
     public static final int[] COAL_VEIN = {7456, 7489};
     public static final int[] SILVER_VEIN = {7457, 7490};
     public static final int GOLD_VEIN = 0;
-    public static final int MITHRIL_VEIN = 0;
-    public static final int ADAMANITE_VEIN = 0;
+    public static final int[] MITHRIL_VEIN = {7459, 7492};
+    public static final int[] ADAMANITE_VEIN = {7460, 7493};
     public static final int RUNEITE_VEIN = 0;
     public static final int[] BANKERS = {394, 395, 2897, 2898};
     public static final int[] DEPOSIT_BOX = {6948};
@@ -121,7 +121,23 @@ public class BroteinMiner extends PollingScript<ClientContext> implements Messag
 
     };
 
-    public Location seVarrock,swVarrock,barbVillage, seLumbridge;
+    public BoundingBox swLumbridgeMine = new BoundingBox(new Tile(3143,3154), new Tile(3149,3147));
+    public BoundingBox swLumbridgeBank = new BoundingBox(new Tile(3092,3246), new Tile(3097, 3240));
+    public Tile[] swLumbridgePath = {
+            new Tile(3146,3149),
+            new Tile(3148,3162),
+            new Tile(3142,3171),
+            new Tile(3139,3186),
+            new Tile(3137,3197),
+            new Tile(3134,3210),
+            new Tile(3121,3215),
+            new Tile(3110,3224),
+            new Tile(3101,3233),
+            new Tile(3101,3243),
+            new Tile(3093,3243)
+    };
+
+    public Location seVarrock,swVarrock,barbVillage, seLumbridge, swLumbridge;
 
     public Experience experience;
 
@@ -136,6 +152,7 @@ public class BroteinMiner extends PollingScript<ClientContext> implements Messag
         swVarrock = new Location(ctx, swVarrockBank, swVarrockMine, swVarrockPath);
         barbVillage = new Location(ctx, barbVillageBank, barbVillageMine, barbVillagePath);
         seLumbridge = new Location(ctx, seLumbridgeBank,seLumbridgeMine, seLumbridgePath);
+        swLumbridge = new Location(ctx, swLumbridgeBank, swLumbridgeMine, swLumbridgePath);
     }
 
     @Override
@@ -148,16 +165,16 @@ public class BroteinMiner extends PollingScript<ClientContext> implements Messag
 
         switch (state) {
             case MINE:
-                mineRock(TIN_VEIN);
+                mineRock(COAL_VEIN);
                 break;
             case SHIFT_DROP:
-                shiftDrop(TIN_ORE);
+                shiftDrop(COAL_ORE);
                 break;
             case RUN_TO_BANK:
-                seLumbridge.runToBank();
+                swLumbridge.runToBank();
                 break;
             case RUN_TO_MINE:
-                seLumbridge.runToMine();
+                swLumbridge.runToMine();
                 break;
             case BANK:
                 depositInventory();
@@ -257,16 +274,16 @@ public class BroteinMiner extends PollingScript<ClientContext> implements Messag
         if(!ctx.objects.select().id(STAIRS[2]).isEmpty() && ctx.inventory.select().count() < 28){
             return State.DOWN_STAIRS;
         }
-        if (seLumbridge.getMiningBox().getCollision(ctx.players.local().tile()) && isIdle() && ctx.inventory.select().count() < 28) {
+        if (swLumbridge.getMiningBox().getCollision(ctx.players.local().tile()) && isIdle() && ctx.inventory.select().count() < 28) {
             return State.MINE;
         }
-        if (seLumbridge.getMiningBox().getCollision(ctx.players.local().tile()) && ctx.inventory.select().count() == 28 && useShiftDrop) {
+        if (swLumbridge.getMiningBox().getCollision(ctx.players.local().tile()) && ctx.inventory.select().count() == 28 && useShiftDrop) {
             return State.SHIFT_DROP;
         }
         if (ctx.inventory.select().count() == 0) {
             return State.RUN_TO_MINE;
         }
-        if (seLumbridge.getBankBox().getCollision(ctx.players.local().tile()) && ctx.inventory.select().count() > 1 && useBank) {
+        if (swLumbridge.getBankBox().getCollision(ctx.players.local().tile()) && ctx.inventory.select().count() > 1 && useBank) {
             return State.BANK;
         }
         if (ctx.inventory.select().count() == 28 && useBank) {
